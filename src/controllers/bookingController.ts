@@ -3,6 +3,14 @@ import { Booking } from '../models/Booking';
 import { Event } from '../models/Event';
 import ResponseModel from '../middlewares/ResponseModel'; // Adjust the import path as needed
 
+export const getBookings = async (req: Request, res: Response) => {
+  try {
+    const bookings = await Booking.find();
+    return res.status(200).json(ResponseModel.success(bookings, 'Bookings retrieved successfully', 200));
+  } catch (error: any) {
+    return res.status(500).json(ResponseModel.error(error.message, 500));
+  }
+}
 export const createBooking = async (req: Request, res: Response) => {
   const { userId, eventId, quantity } = req.body;
 
@@ -19,15 +27,18 @@ export const createBooking = async (req: Request, res: Response) => {
     if (!event) {
       return res.status(404).json(ResponseModel.error('Event not found', 404));
     }
-
-    if (event.totalTickets - event.bookedTickets < quantity) {
+    const remainingTickets = event.totalTickets - event.bookedTickets;
+    if (remainingTickets < quantity) {
       return res.status(400).json(ResponseModel.error('Not enough tickets available', 400));
     }
 
     const booking = new Booking({ userId, eventId, quantity });
     await booking.save();
 
+
     event.bookedTickets += quantity;
+    event.remainingTickets = event.totalTickets - event.bookedTickets;
+
     await event.save();
 
     return res.status(201).json(ResponseModel.success(booking, 'Booking created successfully', 201));
@@ -49,6 +60,7 @@ export const cancelBooking = async (req: Request, res: Response) => {
     const event = await Event.findById(booking.eventId);
     if (event) {
       event.bookedTickets -= booking.quantity;
+      event.remainingTickets += booking.quantity;
       await event.save();
     }
 
