@@ -1,8 +1,12 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { Event } from '../models/Event';
-
-export const createEvent = async (req: Request, res: Response) => {
+import ResponseModel from '../middlewares/ResponseModel';
+export const createEvent = async (req: Request, res: Response,next:NextFunction) => {
   const { name, date, totalTickets } = req.body;
+
+  if (!name || !date || !totalTickets) {
+    return ResponseModel.error('Missing required fields');
+  }
 
   try {
     const event = new Event({ name, date, totalTickets });
@@ -13,12 +17,13 @@ export const createEvent = async (req: Request, res: Response) => {
   }
 };
 
-export const getEvents = async (req: Request, res: Response) => {
+export const getEvents = async (req: Request, res: Response,next:NextFunction) => {
   try {
     const events = await Event.find();
+    ResponseModel.success(events);
     res.status(200).json(events);
   } catch (error: any) {
-    res.status(500).json({ message: error.message });
+    return ResponseModel.error(error.message);
   }
 };
 
