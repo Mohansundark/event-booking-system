@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { createEvent, getEvents, getEventById } from '../controllers/eventController';
-import { createBooking, cancelBooking, getBookings } from '../controllers/bookingController';
+import { createBooking, cancelBooking, getBookings, printTicket } from '../controllers/bookingController';
 
 const router = Router();
 
@@ -11,6 +11,6 @@ router.get('/events/:id', getEventById);
 router.get('/bookings',getBookings );
 router.post('/bookings', createBooking);
 router.delete('/bookings/:id', cancelBooking);
-// router.post('/print-ticket', printTicket);
+router.post('/print-ticket', printTicket);
 
 export default router;
