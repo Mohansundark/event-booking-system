@@ -11,6 +11,6 @@ router.get('/events/:id', getEventById);
 router.get('/bookings',getBookings );
 router.post('/bookings', createBooking);
 router.delete('/bookings/:id', cancelBooking);
-router.post('/print-ticket', printTicket);
+router.post('/print-ticket/:bid', printTicket);
 
 export default router;
