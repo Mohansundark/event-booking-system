@@ -4,7 +4,7 @@
 
 ## Overview
 
-The Event Booking System is a web application built with Node.js, TypeScript, Express.js, and MongoDB. It provides functionality for managing events, booking tickets, and handling user authentication. The system supports creating events, booking tickets with limits, and printing tickets.
+The Event Booking System is a web application built with Node.js, TypeScript, Express.js, and MongoDB. It provides functionality for managing events and booking tickets. The system supports creating events, booking tickets with limits, and printing tickets.
 
 ## Features
 
@@ -19,33 +19,25 @@ The Event Booking System is a web application built with Node.js, TypeScript, Ex
 
 - **POST /api/events**
   - **Description**: Create a new event.
-  - **Request Body**:
-  -  `{ "name": "Event Name",
-  -   "date": "Event Date",
-  -    "totalTickets": Number }`
-  
+  - **Request Body**: `{ "name": "Event Name", "date": "Event Date", "totalTickets": Number }`
+ 
 
 - **GET /api/events**
   - **Description**: Retrieve a list of events with available tickets.
-  
-
+ 
 - **GET /api/events/:id**
   - **Description**: Retrieve details of a specific event, including booked and remaining tickets.
-  
-
+ 
 ### Bookings
 
 - **POST /api/bookings**
   - **Description**: Book tickets for an event.
-  - **Request Body**:
-  -  `{ "userId": "User ID",
-  - "eventId": "Event ID",
-  -  "quantity": Number }`
-  
+  - **Request Body**: `{ "userId": "User ID", "eventId": "Event ID", "quantity": Number }`
+
 
 - **GET /api/bookings**
   - **Description**: Retrieve all bookings for the authenticated user.
- 
+
 
 - **DELETE /api/bookings/:id**
   - **Description**: Cancel a booking by ID.
@@ -54,7 +46,7 @@ The Event Booking System is a web application built with Node.js, TypeScript, Ex
 - **POST /api/bookings/print-ticket**
   - **Description**: Generate a printable ticket for a specific booking.
   - **Request Body**: `{ "bid": "Booking ID" }`
- 
+  
 
 ## Setup
 
@@ -132,3 +124,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 For any inquiries, please contact [your-email@example.com](mailto:mohansundar792002@gmail.com).
 
 ---
+
+Feel free to modify the placeholders (e.g., repository URL, email address) and any additional information to fit your needs.
