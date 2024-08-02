@@ -7,7 +7,7 @@
     "build": "tsc",
     "start": "node dist/app.js",
     "dev": "ts-node src/app.ts",
-    "watch": "nodemon src/app.ts"
+    "watch": "tsc && nodemon src/app.ts"
   },
   "keywords": [],
   "author": "Mohansundar",
