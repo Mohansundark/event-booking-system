@@ -23,11 +23,16 @@ export const createBooking = async (req: Request, res: Response) => {
     return res.status(400).json(ResponseModel.error('Missing required fields', 400));
   }
 
+  // Validate that eventId is a ObjectId
+  if (!eventId.match(/^[0-9a-fA-F]{24}$/)) {
+    return res.status(400).json(ResponseModel.error('Invalid event ID', 400));
+  }
+
   const Quantity = Number(quantity);
   
   // Validate that quantity is a whole number
-  if (!Number.isInteger(Quantity)) {
-    return res.status(400).json(ResponseModel.error('Quantity must be a whole number', 400));
+  if (!Number.isInteger(Quantity) || Quantity <= 0) {
+    return res.status(400).json(ResponseModel.error('Quantity must be a positive whole number', 400));
   }
 
   // Validate maximum quantity
@@ -66,7 +71,17 @@ export const cancelBooking = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
 
-    // Find the booking by ID
+    // Validate required fields
+    if (!id) {
+      return res.status(400).json(ResponseModel.error('Missing required fields', 400));
+    }
+
+    // Validate id to Obbject id type
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json(ResponseModel.error('Invalid booking ID', 400));
+    }
+
+       // Find the booking by ID
     const booking = await Booking.findById(id);
     if (!booking) {
       return res.status(404).json(ResponseModel.error('Booking not found', 404));
@@ -92,6 +107,18 @@ export const cancelBooking = async (req: Request, res: Response) => {
 export const printTicket = async (req: Request, res: Response) => {
   try {
     const id = req.body.bid;
+
+    // Validate required fields
+    if (!id) {
+      return res.status(400).json(ResponseModel.error('Missing required fields', 400));
+    }
+
+    // Validate id to Obbject id type
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json(ResponseModel.error('Invalid booking ID', 400));
+    }
+
+    
 
     // Find the booking by ID and populate the event details
     const booking: IBooking | null = await Booking.findById(id).populate<{ eventId: IEvent }>('eventId');

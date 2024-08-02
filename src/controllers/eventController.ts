@@ -10,6 +10,27 @@ export const createEvent = async (req: Request, res: Response, next: NextFunctio
   if (!name || !date || !totalTickets) {
     return res.status(400).json(ResponseModel.error('Missing required fields', 400));
   }
+  //Validate date is a valid date
+  if (!Date.parse(date)) {
+    return res.status(400).json(ResponseModel.error('Invalid date', 400));
+  }
+
+  //Validate date is in the future
+  if (new Date(date) < new Date()) {
+    return res.status(400).json(ResponseModel.error('Date must be in the future', 400));
+  }
+
+ 
+
+  //Validate totalTickets is a whole number
+  if (!Number.isInteger(totalTickets) || totalTickets <= 0) {
+    return res.status(400).json(ResponseModel.error('Total tickets must be a positive whole number', 400));
+  }
+
+  // Validate maximum tickets
+  if (totalTickets > 150) {
+    return res.status(400).json(ResponseModel.error('Cannot have more than 150 tickets', 400));
+  }
 
   try {
     // Create and save the new event
@@ -35,7 +56,17 @@ export const getEvents = async (req: Request, res: Response, next: NextFunction)
 export const getEventById = async (req: Request, res: Response, next: NextFunction) => {
   try {
     // Find the event by ID
-    const event = await Event.findById(req.params.id);
+    const id = req.params.id;
+    if (!id) {
+      return res.status(400).json(ResponseModel.error('Missing required fields', 400));
+    }
+    //validate id to Obbject id type
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json(ResponseModel.error('Invalid event ID', 400));
+    }
+
+    // Find the event by ID
+    const event = await Event.findById(id);
     if (!event) {
       return res.status(404).json(ResponseModel.error('Event not found', 404));
     }
