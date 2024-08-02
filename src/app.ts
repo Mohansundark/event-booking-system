@@ -1,28 +1,34 @@
-import express, { Application } from 'express';
+import express, { Application, Request, Response, NextFunction } from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-dotenv.config(); // Load environment variables from .env file
-import event from './routes/eventRoutes';
-import booking from './routes/bookingRoutes';
+dotenv.config();
+import eventRoutes from './routes/eventRoutes';
+import bookingRoutes from './routes/bookingRoutes';
 import ResponseModel from './middlewares/ResponseModel';
 
-const app: Application = express();
 
-// Middleware to parse JSON bodies
+const app: Application = express();
 app.use(express.json());
-// Middleware to parse URL-encoded bodies
 app.use(express.urlencoded({ extended: true }));
 
-// Routes for event-related endpoints
-app.use('/api/events', event);
-// Routes for booking-related endpoints
-app.use('/api/bookings', booking);
+//log the requests
+app.use((req:Request, res:Response, next:NextFunction) => {
+  console.log(`${req.method} ${req.url} - ${req.ip} - ${req.headers['user-agent']}`);
+  next();
+});
 
-// Middleware for handling Unregistered Routes errors
-app.use((req, res, next) => {
+//routes for events related api
+app.use('/api/events', eventRoutes);
+
+//routes for booking related api
+app.use('/api/bookings', bookingRoutes);
+
+// Middleware for handling 404 errors
+app.use((req:Request, res:Response, next:NextFunction) => {
   res.status(404).json(ResponseModel.error('Route Not found', 404));
   next();
 });
+
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/eventbooking')
