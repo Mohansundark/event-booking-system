@@ -9,6 +9,7 @@ export interface IEvent extends Document {
   remainingTickets: number;
 }
 
+//Event Schema
 const eventSchema = new Schema<IEvent>({
   name: { type: String, required: true },
   date: { type: Date, required: true },

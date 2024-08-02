@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
 import { Booking, IBooking } from '../models/Booking';
 import { Event, IEvent } from '../models/Event';
-import ResponseModel from '../middlewares/ResponseModel'; // Adjust the import path as needed
+import ResponseModel from '../middlewares/ResponseModel'; 
 import PDFDocument from 'pdfkit';
 
+// Controller to get all bookings
 export const getBookings = async (req: Request, res: Response) => {
   try {
     const bookings = await Booking.find();
@@ -13,18 +14,23 @@ export const getBookings = async (req: Request, res: Response) => {
   }
 };
 
+// Controller to create a new booking
 export const createBooking = async (req: Request, res: Response) => {
   const { userId, eventId, quantity } = req.body;
   
+  // Validate required fields
   if (!userId || !eventId || !quantity) {
     return res.status(400).json(ResponseModel.error('Missing required fields', 400));
   }
 
-
   const Quantity = Number(quantity);
+  
+  // Validate that quantity is a whole number
   if (!Number.isInteger(Quantity)) {
     return res.status(400).json(ResponseModel.error('Quantity must be a whole number', 400));
   }
+
+  // Validate maximum quantity
   if (Quantity > 15) {
     return res.status(400).json(ResponseModel.error('Cannot book more than 15 tickets', 400));
   }
@@ -35,13 +41,16 @@ export const createBooking = async (req: Request, res: Response) => {
       return res.status(404).json(ResponseModel.error('Event not found', 404));
     }
 
-    if (event.totalTickets - event.bookedTickets  < Quantity) {
+    // Check if there are enough tickets available
+    if (event.totalTickets - event.bookedTickets < Quantity) {
       return res.status(400).json(ResponseModel.error('Not enough tickets available', 400));
     }
 
-    const booking = new Booking({ userId, eventId, quantity:Quantity });
+    // Create and save the new booking
+    const booking = new Booking({ userId, eventId, quantity: Quantity });
     await booking.save();
 
+    // Update the event's booked and remaining tickets
     event.bookedTickets += Quantity;
     event.remainingTickets = event.totalTickets - event.bookedTickets;
     await event.save();
@@ -52,16 +61,18 @@ export const createBooking = async (req: Request, res: Response) => {
   }
 };
 
+// Controller to cancel a booking
 export const cancelBooking = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
 
+    // Find the booking by ID
     const booking = await Booking.findById(id);
-
     if (!booking) {
       return res.status(404).json(ResponseModel.error('Booking not found', 404));
     }
 
+    // Update the event's booked and remaining tickets if the event exists
     const event = await Event.findById(booking.eventId);
     if (event) {
       event.bookedTickets -= booking.quantity;
@@ -69,6 +80,7 @@ export const cancelBooking = async (req: Request, res: Response) => {
       await event.save();
     }
 
+    // Delete the booking
     await booking.deleteOne();
     return res.status(200).json(ResponseModel.success(null, 'Booking canceled', 200));
   } catch (error: any) {
@@ -76,9 +88,12 @@ export const cancelBooking = async (req: Request, res: Response) => {
   }
 };
 
+// Controller to print a ticket as a PDF
 export const printTicket = async (req: Request, res: Response) => {
   try {
     const id = req.body.bid;
+
+    // Find the booking by ID and populate the event details
     const booking: IBooking | null = await Booking.findById(id).populate<{ eventId: IEvent }>('eventId');
     if (!booking) {
       return res.status(404).json(ResponseModel.error('Booking not found', 404));
@@ -86,10 +101,10 @@ export const printTicket = async (req: Request, res: Response) => {
 
     const event = booking.eventId;
 
-    // Create a PDF document
+    // Create a new PDF document
     const doc = new PDFDocument();
-    
-    // Stream the PDF to the response
+
+    // Set response headers for PDF file
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename=ticket_${id}.pdf`);
 

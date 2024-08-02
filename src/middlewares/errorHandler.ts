@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import ResponseModel from './ResponseModel'; // Adjust the import path as needed
+import ResponseModel from './ResponseModel'; 
 
 // Define a custom error type if needed
 interface CustomError extends Error {

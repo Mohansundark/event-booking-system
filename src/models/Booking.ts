@@ -9,6 +9,7 @@ export interface IBooking extends Document {
   timestamp: Date;
 }
 
+//Booking Schena
 const bookingSchema = new Schema<IBooking>({
   userId: { type: String, required: true },
   eventId: { type: Schema.Types.ObjectId, ref: 'Event', required: true },
