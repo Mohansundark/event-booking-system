@@ -15,12 +15,17 @@ export const getBookings = async (req: Request, res: Response) => {
 
 export const createBooking = async (req: Request, res: Response) => {
   const { userId, eventId, quantity } = req.body;
-
+  
   if (!userId || !eventId || !quantity) {
     return res.status(400).json(ResponseModel.error('Missing required fields', 400));
   }
 
-  if (quantity > 15) {
+
+  const Quantity = Number(quantity);
+  if (!Number.isInteger(Quantity)) {
+    return res.status(400).json(ResponseModel.error('Quantity must be a whole number', 400));
+  }
+  if (Quantity > 15) {
     return res.status(400).json(ResponseModel.error('Cannot book more than 15 tickets', 400));
   }
 
@@ -30,14 +35,14 @@ export const createBooking = async (req: Request, res: Response) => {
       return res.status(404).json(ResponseModel.error('Event not found', 404));
     }
 
-    if (event.totalTickets - event.bookedTickets  < quantity) {
+    if (event.totalTickets - event.bookedTickets  < Quantity) {
       return res.status(400).json(ResponseModel.error('Not enough tickets available', 400));
     }
 
-    const booking = new Booking({ userId, eventId, quantity });
+    const booking = new Booking({ userId, eventId, quantity:Quantity });
     await booking.save();
 
-    event.bookedTickets += quantity;
+    event.bookedTickets += Quantity;
     event.remainingTickets = event.totalTickets - event.bookedTickets;
     await event.save();
 
@@ -73,7 +78,7 @@ export const cancelBooking = async (req: Request, res: Response) => {
 
 export const printTicket = async (req: Request, res: Response) => {
   try {
-    const id = req.params.bid;
+    const id = req.body.bid;
     const booking: IBooking | null = await Booking.findById(id).populate<{ eventId: IEvent }>('eventId');
     if (!booking) {
       return res.status(404).json(ResponseModel.error('Booking not found', 404));

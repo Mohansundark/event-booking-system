@@ -1,21 +1,20 @@
 import express, { Application } from 'express';
-import mongoose from 'mongoose';  // Adjust the import path as needed
+import mongoose from 'mongoose';  
 import dotenv from 'dotenv';
 dotenv.config();
-import index from './routes/index'
-import { configDotenv } from 'dotenv';
+import event from './routes/eventRoutes'
+import booking from './routes/bookingRoutes'
 import ResponseModel from './middlewares/ResponseModel';
+
 const app: Application = express();
 
-// Middleware and routes setup
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Define your routes here
 
-// Use the error handling middleware
 
-app.use('/api', index)
+app.use('/api/events', event)
+app.use('/api/bookings',booking)
 app.use((req, res, next) => {
   res.status(404).json(ResponseModel.error('Route Not found', 404));
   next();
