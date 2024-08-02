@@ -233,7 +233,7 @@ Deploy your application to your preferred hosting platform (e.g., Vercel, Heroku
 
 ## Live Demo
 
-You can access the live version of the application [here](https://event-booking-system-pex8.onrender.com).
+You can access the live version of the application [here](https://event-booking-system-pex8.onrender.com).**Please note that it may take around 10-20 seconds for the demo to spin up.**
 
 ## Contact
 
