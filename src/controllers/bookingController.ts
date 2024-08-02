@@ -17,7 +17,7 @@ export const getBookings = async (req: Request, res: Response) => {
 // Controller to create a new booking
 export const createBooking = async (req: Request, res: Response) => {
   const { userId, eventId, quantity } = req.body;
-  
+
   // Validate required fields
   if (!userId || !eventId || !quantity) {
     return res.status(400).json(ResponseModel.error('Missing required fields', 400));
@@ -28,15 +28,13 @@ export const createBooking = async (req: Request, res: Response) => {
     return res.status(400).json(ResponseModel.error('Invalid event ID', 400));
   }
 
-  const Quantity = Number(quantity);
-  
   // Validate that quantity is a whole number
-  if (!Number.isInteger(Quantity) || Quantity <= 0) {
+  if (!Number.isInteger(quantity) || quantity <= 0) {
     return res.status(400).json(ResponseModel.error('Quantity must be a positive whole number', 400));
   }
 
   // Validate maximum quantity
-  if (Quantity > 15) {
+  if (quantity > 15) {
     return res.status(400).json(ResponseModel.error('Cannot book more than 15 tickets', 400));
   }
 
@@ -47,16 +45,16 @@ export const createBooking = async (req: Request, res: Response) => {
     }
 
     // Check if there are enough tickets available
-    if (event.totalTickets - event.bookedTickets < Quantity) {
+    if (event.totalTickets - event.bookedTickets < quantity) {
       return res.status(400).json(ResponseModel.error('Not enough tickets available', 400));
     }
 
     // Create and save the new booking
-    const booking = new Booking({ userId, eventId, quantity: Quantity });
+    const booking = new Booking({ userId, eventId, quantity });
     await booking.save();
 
     // Update the event's booked and remaining tickets
-    event.bookedTickets += Quantity;
+    event.bookedTickets += quantity;
     event.remainingTickets = event.totalTickets - event.bookedTickets;
     await event.save();
 
@@ -73,15 +71,15 @@ export const cancelBooking = async (req: Request, res: Response) => {
 
     // Validate required fields
     if (!id) {
-      return res.status(400).json(ResponseModel.error('Missing required fields', 400));
+      return res.status(400).json(ResponseModel.error('Booking ID is required', 400));
     }
 
-    // Validate id to Obbject id type
+    // Validate id to ObjectId type
     if (!id.match(/^[0-9a-fA-F]{24}$/)) {
-      return res.status(400).json(ResponseModel.error('Invalid booking ID', 400));
+      return res.status(400).json(ResponseModel.error('Invalid booking ID format', 400));
     }
 
-       // Find the booking by ID
+    // Find the booking by ID
     const booking = await Booking.findById(id);
     if (!booking) {
       return res.status(404).json(ResponseModel.error('Booking not found', 404));
@@ -110,15 +108,13 @@ export const printTicket = async (req: Request, res: Response) => {
 
     // Validate required fields
     if (!id) {
-      return res.status(400).json(ResponseModel.error('Missing required fields', 400));
+      return res.status(400).json(ResponseModel.error('Booking ID is required', 400));
     }
 
-    // Validate id to Obbject id type
+    // Validate id to ObjectId type
     if (!id.match(/^[0-9a-fA-F]{24}$/)) { 
-      return res.status(400).json(ResponseModel.error('Invalid booking ID', 400));
+      return res.status(400).json(ResponseModel.error('Invalid booking ID format', 400));
     }
-
-
 
     // Find the booking by ID and populate the event details
     const booking: IBooking | null = await Booking.findById(id).populate<{ eventId: IEvent }>('eventId');
