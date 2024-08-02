@@ -16,8 +16,8 @@ export const getBookings = async (req: Request, res: Response) => {
 
 // Controller to create a new booking
 export const createBooking = async (req: Request, res: Response) => {
-  const { userId, eventId, quantity } = req.body;
-
+  const { userId, eventId } = req.body;
+  let { quantity } = req.body;
   // Validate required fields
   if (!userId || !eventId || !quantity) {
     return res.status(400).json(ResponseModel.error('Missing required fields', 400));
@@ -35,7 +35,8 @@ export const createBooking = async (req: Request, res: Response) => {
 
   // Validate maximum quantity
   if (quantity > 15) {
-    return res.status(400).json(ResponseModel.error('Cannot book more than 15 tickets', 400));
+    quantity = 15;
+    
   }
 
   try {

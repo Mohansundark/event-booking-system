@@ -30,7 +30,8 @@ const getBookings = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 exports.getBookings = getBookings;
 // Controller to create a new booking
 const createBooking = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { userId, eventId, quantity } = req.body;
+    const { userId, eventId } = req.body;
+    let { quantity } = req.body;
     // Validate required fields
     if (!userId || !eventId || !quantity) {
         return res.status(400).json(ResponseModel_1.default.error('Missing required fields', 400));
@@ -45,7 +46,7 @@ const createBooking = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
     // Validate maximum quantity
     if (quantity > 15) {
-        return res.status(400).json(ResponseModel_1.default.error('Cannot book more than 15 tickets', 400));
+        quantity = 15;
     }
     try {
         const event = yield Event_1.Event.findById(eventId);
