@@ -10,7 +10,6 @@ The Event Booking System is a web application built with Node.js, TypeScript, Ex
 
 - **Event Management**: Create and retrieve event details.
 - **Booking Management**: Book tickets, check availability, and cancel bookings.
-- **User Authentication**: Register, log in, and manage user sessions.
 - **Ticket Printing**: Generate printable tickets in PDF format.
 - **Booking Limits**: Users can book up to 15 tickets per request.
 
@@ -20,36 +19,42 @@ The Event Booking System is a web application built with Node.js, TypeScript, Ex
 
 - **POST /api/events**
   - **Description**: Create a new event.
-  - **Request Body**: `{ "name": "Event Name", "date": "Event Date", "totalTickets": Number }`
-  - **Authentication**: Required
+  - **Request Body**:
+  -  `{ "name": "Event Name",
+  -   "date": "Event Date",
+  -    "totalTickets": Number }`
+  
 
 - **GET /api/events**
   - **Description**: Retrieve a list of events with available tickets.
-  - **Authentication**: Not required
+  
 
 - **GET /api/events/:id**
   - **Description**: Retrieve details of a specific event, including booked and remaining tickets.
-  - **Authentication**: Not required
+  
 
 ### Bookings
 
 - **POST /api/bookings**
   - **Description**: Book tickets for an event.
-  - **Request Body**: `{ "userId": "User ID", "eventId": "Event ID", "quantity": Number }`
-  - **Authentication**: Required
+  - **Request Body**:
+  -  `{ "userId": "User ID",
+  - "eventId": "Event ID",
+  -  "quantity": Number }`
+  
 
 - **GET /api/bookings**
   - **Description**: Retrieve all bookings for the authenticated user.
-  - **Authentication**: Required
+ 
 
 - **DELETE /api/bookings/:id**
   - **Description**: Cancel a booking by ID.
-  - **Authentication**: Required
+ 
 
 - **POST /api/bookings/print-ticket**
   - **Description**: Generate a printable ticket for a specific booking.
   - **Request Body**: `{ "bid": "Booking ID" }`
-  - **Authentication**: Required
+ 
 
 ## Setup
 
@@ -124,6 +129,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Contact
 
-For any inquiries, please contact [your-email@example.com](mailto:your-email@example.com).
+For any inquiries, please contact [your-email@example.com](mailto:mohansundar792002@gmail.com).
 
 ---
