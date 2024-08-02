@@ -22,11 +22,31 @@ const createEvent = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
     if (!name || !date || !totalTickets) {
         return res.status(400).json(ResponseModel_1.default.error('Missing required fields', 400));
     }
+    // Validate date is a valid date
+    if (!Date.parse(date)) {
+        return res.status(400).json(ResponseModel_1.default.error('Invalid date', 400));
+    }
+    // Validate date is in the future
+    if (new Date(date) < new Date()) {
+        return res.status(400).json(ResponseModel_1.default.error('Date must be in the future', 400));
+    }
+    // Validate totalTickets is a whole number
+    if (!Number.isInteger(totalTickets) || totalTickets <= 0) {
+        return res.status(400).json(ResponseModel_1.default.error('Total tickets must be a positive whole number', 400));
+    }
+    // Validate maximum tickets
+    if (totalTickets > 150) {
+        return res.status(400).json(ResponseModel_1.default.error('Cannot have more than 150 tickets', 400));
+    }
     try {
+        const existingEvent = yield Event_1.Event.findOne({ name });
+        if (existingEvent) {
+            return res.status(400).json(ResponseModel_1.default.error('Event already exists', 400));
+        }
         // Create and save the new event
-        const event = new Event_1.Event({ name, date, totalTickets });
-        yield event.save();
-        return res.status(201).json(ResponseModel_1.default.success(event, 'Event created successfully', 201));
+        const newEvent = new Event_1.Event({ name, date, totalTickets });
+        yield newEvent.save();
+        return res.status(201).json(ResponseModel_1.default.success(newEvent, 'Event created successfully', 201));
     }
     catch (error) {
         return res.status(500).json(ResponseModel_1.default.error(error.message, 500));
@@ -47,8 +67,17 @@ exports.getEvents = getEvents;
 // Controller to get an event by ID
 const getEventById = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        // Validate ID parameter
+        const id = req.params.id;
+        if (!id) {
+            return res.status(400).json(ResponseModel_1.default.error('Event ID is required', 400));
+        }
+        // Validate ID format
+        if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+            return res.status(400).json(ResponseModel_1.default.error('Invalid event ID format', 400));
+        }
         // Find the event by ID
-        const event = yield Event_1.Event.findById(req.params.id);
+        const event = yield Event_1.Event.findById(id);
         if (!event) {
             return res.status(404).json(ResponseModel_1.default.error('Event not found', 404));
         }

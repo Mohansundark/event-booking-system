@@ -35,13 +35,16 @@ const createBooking = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     if (!userId || !eventId || !quantity) {
         return res.status(400).json(ResponseModel_1.default.error('Missing required fields', 400));
     }
-    const Quantity = Number(quantity);
+    // Validate that eventId is a ObjectId
+    if (!eventId.match(/^[0-9a-fA-F]{24}$/)) {
+        return res.status(400).json(ResponseModel_1.default.error('Invalid event ID', 400));
+    }
     // Validate that quantity is a whole number
-    if (!Number.isInteger(Quantity)) {
-        return res.status(400).json(ResponseModel_1.default.error('Quantity must be a whole number', 400));
+    if (!Number.isInteger(quantity) || quantity <= 0) {
+        return res.status(400).json(ResponseModel_1.default.error('Quantity must be a positive whole number', 400));
     }
     // Validate maximum quantity
-    if (Quantity > 15) {
+    if (quantity > 15) {
         return res.status(400).json(ResponseModel_1.default.error('Cannot book more than 15 tickets', 400));
     }
     try {
@@ -50,14 +53,14 @@ const createBooking = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             return res.status(404).json(ResponseModel_1.default.error('Event not found', 404));
         }
         // Check if there are enough tickets available
-        if (event.totalTickets - event.bookedTickets < Quantity) {
+        if (event.totalTickets - event.bookedTickets < quantity) {
             return res.status(400).json(ResponseModel_1.default.error('Not enough tickets available', 400));
         }
         // Create and save the new booking
-        const booking = new Booking_1.Booking({ userId, eventId, quantity: Quantity });
+        const booking = new Booking_1.Booking({ userId, eventId, quantity });
         yield booking.save();
         // Update the event's booked and remaining tickets
-        event.bookedTickets += Quantity;
+        event.bookedTickets += quantity;
         event.remainingTickets = event.totalTickets - event.bookedTickets;
         yield event.save();
         return res.status(201).json(ResponseModel_1.default.success(booking, 'Booking created successfully', 201));
@@ -71,6 +74,14 @@ exports.createBooking = createBooking;
 const cancelBooking = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const id = req.params.id;
+        // Validate required fields
+        if (!id) {
+            return res.status(400).json(ResponseModel_1.default.error('Booking ID is required', 400));
+        }
+        // Validate id to ObjectId type
+        if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+            return res.status(400).json(ResponseModel_1.default.error('Invalid booking ID format', 400));
+        }
         // Find the booking by ID
         const booking = yield Booking_1.Booking.findById(id);
         if (!booking) {
@@ -96,6 +107,14 @@ exports.cancelBooking = cancelBooking;
 const printTicket = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const id = req.body.bid;
+        // Validate required fields
+        if (!id) {
+            return res.status(400).json(ResponseModel_1.default.error('Booking ID is required', 400));
+        }
+        // Validate id to ObjectId type
+        if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+            return res.status(400).json(ResponseModel_1.default.error('Invalid booking ID format', 400));
+        }
         // Find the booking by ID and populate the event details
         const booking = yield Booking_1.Booking.findById(id).populate('eventId');
         if (!booking) {
