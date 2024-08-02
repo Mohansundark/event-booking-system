@@ -15,7 +15,9 @@ app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 //log the requests
 app.use((req, res, next) => {
-    console.log(`${req.method} ${req.url} - ${req.ip} - ${req.headers['user-agent']}`);
+    res.on('finish', () => {
+        console.log(`${req.method} ${req.url} - ${req.ip} - ${req.headers['user-agent']} - ${res.statusCode} ${res.statusMessage}`);
+    });
     next();
 });
 //routes for events related api

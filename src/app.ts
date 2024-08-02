@@ -11,11 +11,15 @@ const app: Application = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+
 //log the requests
-app.use((req:Request, res:Response, next:NextFunction) => {
-  console.log(`${req.method} ${req.url} - ${req.ip} - ${req.headers['user-agent']}`);
+app.use((req: Request, res: Response, next: NextFunction) => {
+  res.on('finish', () => {
+    console.log(`${req.method} ${req.url} - ${req.ip} - ${req.headers['user-agent']} - ${res.statusCode} ${res.statusMessage}`);
+  });
   next();
 });
+
 
 //routes for events related api
 app.use('/api/events', eventRoutes);
