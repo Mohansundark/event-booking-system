@@ -114,11 +114,11 @@ export const printTicket = async (req: Request, res: Response) => {
     }
 
     // Validate id to Obbject id type
-    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) { 
       return res.status(400).json(ResponseModel.error('Invalid booking ID', 400));
     }
 
-    
+
 
     // Find the booking by ID and populate the event details
     const booking: IBooking | null = await Booking.findById(id).populate<{ eventId: IEvent }>('eventId');

@@ -20,7 +20,6 @@ export const createEvent = async (req: Request, res: Response, next: NextFunctio
     return res.status(400).json(ResponseModel.error('Date must be in the future', 400));
   }
 
- 
 
   //Validate totalTickets is a whole number
   if (!Number.isInteger(totalTickets) || totalTickets <= 0) {
@@ -32,10 +31,15 @@ export const createEvent = async (req: Request, res: Response, next: NextFunctio
     return res.status(400).json(ResponseModel.error('Cannot have more than 150 tickets', 400));
   }
 
+  const event = await Event.findOne({ name });
+  if (event) {
+    return res.status(400).json(ResponseModel.error('Event already exists', 400));
+  }
+
   try {
     // Create and save the new event
-    const event = new Event({ name, date, totalTickets });
-    await event.save();
+    const newEvent = new Event({ name, date, totalTickets });
+    await newEvent.save();
     return res.status(201).json(ResponseModel.success(event, 'Event created successfully', 201));
   } catch (error: any) {
     return res.status(500).json(ResponseModel.error(error.message, 500));
